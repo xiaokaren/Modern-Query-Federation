@@ -92,8 +92,8 @@ def join_on_sorted():
     # join customer's first column with orders' first column, could be a nested loop join, hash join, sort merge join etc.
     
     #joined_data = nested_loop_join(customer_data, 0, orders_data, 0)
-    joined_data = hash_join_singlecol(customer_data, 0, orders_data, 0)
-    #joined_data = sort_merge_join(customer_data, orders_data)
+    #joined_data = hash_join_singlecol(customer_data, 0, orders_data, 0)
+   #joined_data = sort_merge_join(customer_data, orders_data)
 
     for row in joined_data:
         print(row)
@@ -167,6 +167,42 @@ def sort_merge_join(table1, table2):
     index1 = 0
     index2 = 0
 
+    while index1 < length1 and index2 < length2:
+        if table1[index1] > table2[index2]:
+            index2 += 1
+        elif table1[index1] < table2[index2]:
+            index1 += 1
+        else:
+            result.append(table1[index1] + table2[index2])
+            mark1 = index1
+            mark2 = index2
+            while True:
+                while index2 < length2 - 1 and table2[index2] == table2[index2 + 1]:
+                    index2 += 1
+                    result.append(table1[index1] + table2[index2])
+                if index1 < length1 - 1 and table1[index1] == table1[index1 + 1]:
+                    index1 += 1
+                    index2 = mark2
+                    result.append(table1[index1] + table2[index2])
+                else:
+                    index1 += 1
+                    index2 += 1
+                    break
+
+    return result
+
+def sort_merge_join_original(table1, table2):
+    result = []
+
+    table1.sort()
+    table2.sort()
+
+    length1 = len(table1)
+    length2 = len(table2)
+
+    index1 = 0
+    index2 = 0
+
     t2_at_end = False
     t1_at_end = False
 
@@ -222,7 +258,7 @@ def test_join():
     assert len(join_all_on_sqllite()) == 6
     
 #create_db()
-#load_data(20000)
+#load_data(10000)
 #join_all_on_sqllite()
-#join_on_mini_trino()
-join_on_sorted()
+join_on_mini_trino()
+#join_on_sorted()
